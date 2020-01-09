@@ -167,7 +167,7 @@ class BalloonDataset(utils.Dataset):
                         dtype=np.uint8)
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+            rr, cc = skimage.draw.polygon(p['y'], p['x'])
             mask[rr, cc, i] = 1
 
         # Return mask, and array of class IDs of each instance. Since we have
@@ -202,7 +202,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
+                epochs=10,
                 layers='heads')
 
 
