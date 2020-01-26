@@ -59,7 +59,7 @@ class FlowchartConfig(Config):
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
-    NAME = "Flowchart_symbol"
+    NAME = "Flowchart_symbols"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
@@ -87,13 +87,13 @@ class FlowchartDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("Flowchart_symbol", 1, "arrow")
-        self.add_class("Flowchart_symbol", 2, "data")
-        self.add_class("Flowchart_symbol", 3, "process")
-        self.add_class("Flowchart_symbol", 4, "decision")
-        self.add_class("Flowchart_symbol", 5, "connection")
-        self.add_class("Flowchart_symbol", 6, "text")
-        self.add_class("Flowchart_symbol", 7, "terminator")
+        self.add_class("Flowchart_symbols", 1, "arrow")
+        self.add_class("Flowchart_symbols", 2, "data")
+        self.add_class("Flowchart_symbols", 3, "process")
+        self.add_class("Flowchart_symbols", 4, "decision")
+        self.add_class("Flowchart_symbols", 5, "connection")
+        self.add_class("Flowchart_symbols", 6, "text")
+        self.add_class("Flowchart_symbols", 7, "terminator")
         
 
         # Train or validation dataset?
@@ -134,6 +134,27 @@ class FlowchartDataset(utils.Dataset):
             else:
                 polygons = [r['shape_attributes'] for r in a['regions']] 
 
+            class_names_str_temp  = [r['region_attributes'] for r in a['regions'] if a['regions']]
+            # print(class_names_str_temp)
+            class_name_nums = []
+            class_names_str=[i for i in  class_names_str_temp if bool(i) != False]
+
+            for i in  class_names_str:
+                if i['Flowchart_symbols'] == 'arrow':
+                    class_name_nums.append(1)
+                if i['Flowchart_symbols'] == 'data':
+                    class_name_nums.append(2)
+                if i['Flowchart_symbols'] == 'process':
+                    class_name_nums.append(3)
+                if i['Flowchart_symbols'] == 'decision':
+                    class_name_nums.append(4)
+                if i['Flowchart_symbols'] == 'connection':
+                    class_name_nums.append(5)
+                if i['Flowchart_symbols'] == 'text':
+                    class_name_nums.append(6)
+                if i['Flowchart_symbols'] == 'terminator':
+                    class_name_nums.append(7)
+
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
             # the image. This is only managable since the dataset is tiny.
@@ -142,11 +163,12 @@ class FlowchartDataset(utils.Dataset):
             height, width = image.shape[:2]
 
             self.add_image(
-                "Flowchart_symbol",
+                "Flowchart_symbols",
                 image_id=a['filename'],  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
-                polygons=polygons)
+                polygons=polygons,
+                class_ids = np.array(class_name_nums))
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.
@@ -157,7 +179,7 @@ class FlowchartDataset(utils.Dataset):
         """
         # If not a flowchart dataset image, delegate to parent class.
         image_info = self.image_info[image_id]
-        if image_info["source"] != "Flowchart_symbol":
+        if image_info["source"] != "Flowchart_symbols":
             return super(self.__class__, self).load_mask(image_id)
 
         # Convert polygons to a bitmap mask of shape
@@ -187,7 +209,7 @@ class FlowchartDataset(utils.Dataset):
     def image_reference(self, image_id):
         """Return the path of the image."""
         info = self.image_info[image_id]
-        if info["source"] == "Flowchart_symbol":
+        if info["source"] == "Flowchart_symbols":
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
