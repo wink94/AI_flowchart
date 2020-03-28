@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from for_test_V20 import for_test
 import matplotlib.pyplot as plt
+import cv2 
 # import tkinter.font as tkfont
 
 def imresize(im,sz):
@@ -119,6 +120,10 @@ def trans2():
 		ax.text(0.1, 0.95, prediction_image, fontsize = 28)
 		plt.show()
 
+
+
+im_in = cv2.imread(input_img, cv2.IMREAD_GRAYSCALE);
+th, img_open = cv2.threshold(im_in, 220, 255, cv2.THRESH_BINARY_INV);
 
 # def saveClick():
 # 	path=asksaveasfilename(filetypes = [('*.txt', '.txt')])
