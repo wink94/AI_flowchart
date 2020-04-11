@@ -126,7 +126,7 @@ class FlowchartDataset(utils.Dataset):
             data=json.loads(line)
             val=literal_eval(data)
             folder=val['fileName'].strip().split('/')[0]
-            print(val['fileName'].strip().split('/')[0])
+            # print(val['fileName'].strip().split('/')[0])
             if folder == 'arrow':
                 class_name_nums.append(1)
             if folder == 'data':
@@ -141,25 +141,19 @@ class FlowchartDataset(utils.Dataset):
                 class_name_nums.append(6)
             if folder == 'terminator':
                 class_name_nums.append(7)
-        #    print(class_name_nums)
-            # print(val['fileName'].strip().split('/')[1])
-            # ln=literal_eval(val['fileDetails'])
-            # print(ln['height'])
-            # print(ln['width'])
-            # print(class_name_nums)
-            # print(ln)
+           
             fileName=val['fileName'].strip().split('/')[1]
             fileDetails=literal_eval(val['fileDetails'])
             height=fileDetails['height']
             width=fileDetails['width']
             image_path=os.path.join(dataset_dir,val['fileName'])
 
-            # load_mask() needs the image size to convert polygons to masks.
-            # Unfortunately, VIA doesn't include it in JSON, so we must read
-            # the image. This is only managable since the dataset is tiny.
-            # image_path = os.path.join(dataset_dir, a['filename'])
-            # image = skimage.io.imread(image_path)
-            # height, width = image.shape[:2]
+            print("filename ",fileName)
+            print("fileDetails ",fileDetails)
+            print("height ",height)
+            print("width ",width)
+            print("image_path ",image_path)
+            print("image_path ",class_name_nums)
 
             self.add_image(
                 "Flowchart_symbols",
