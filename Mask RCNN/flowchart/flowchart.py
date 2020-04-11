@@ -87,11 +87,11 @@ class FlowchartDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("Flowchart_symbols", 1, "arrow")
+        self.add_class("Flowchart_symbols", 5, "arrow")
         self.add_class("Flowchart_symbols", 2, "data")
         self.add_class("Flowchart_symbols", 3, "process")
         self.add_class("Flowchart_symbols", 4, "decision")
-        self.add_class("Flowchart_symbols", 5, "connection")
+        self.add_class("Flowchart_symbols", 1, "connection")
         self.add_class("Flowchart_symbols", 6, "text")
         self.add_class("Flowchart_symbols", 7, "terminator")
         
@@ -141,7 +141,7 @@ class FlowchartDataset(utils.Dataset):
 
             for i in  class_names_str:
                 if i['Flowchart_symbols'] == 'arrow':
-                    class_name_nums.append(1)
+                    class_name_nums.append(5)
                 if i['Flowchart_symbols'] == 'data':
                     class_name_nums.append(2)
                 if i['Flowchart_symbols'] == 'process':
@@ -149,7 +149,7 @@ class FlowchartDataset(utils.Dataset):
                 if i['Flowchart_symbols'] == 'decision':
                     class_name_nums.append(4)
                 if i['Flowchart_symbols'] == 'connection':
-                    class_name_nums.append(5)
+                    class_name_nums.append(1)
                 if i['Flowchart_symbols'] == 'text':
                     class_name_nums.append(6)
                 if i['Flowchart_symbols'] == 'terminator':
@@ -234,7 +234,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
+                epochs=3,
                 layers='heads')
 
 

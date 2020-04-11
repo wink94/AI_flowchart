@@ -33,6 +33,7 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
+from ast import literal_eval
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -72,7 +73,7 @@ class FlowchartConfig(Config):
     STEPS_PER_EPOCH = 100
 
     # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.7
+    DETECTION_MIN_CONFIDENCE = 0.9
 
 
 ############################################################
@@ -116,58 +117,56 @@ class FlowchartDataset(utils.Dataset):
         # }
         # We mostly care about the x and y coordinates of each region
         # Note: In VIA 2.0, regions was changed from a dict to a list.
-        annotations = json.load(open(os.path.join(dataset_dir, "via_region_data.json")))
-        annotations = list(annotations.values())  # don't need the dict keys
+        # annotations = json.load(open(os.path.join(dataset_dir, "via_region_data.json")))
 
-        # The VIA tool saves images in the JSON even if they don't have any
-        # annotations. Skip unannotated images.
-        annotations = [a for a in annotations if a['regions']]
-
-        # Add images
-        for a in annotations:
-            # Get the x, y coordinaets of points of the polygons that make up
-            # the outline of each object instance. These are stores in the
-            # shape_attributes (see json format above)
-            # The if condition is needed to support VIA versions 1.x and 2.x.
-            if type(a['regions']) is dict:
-                polygons = [r['shape_attributes'] for r in a['regions'].values()]
-            else:
-                polygons = [r['shape_attributes'] for r in a['regions']] 
-
-            class_names_str_temp  = [r['region_attributes'] for r in a['regions'] if a['regions']]
-            # print(class_names_str_temp)
+        annotations=open(os.path.join(dataset_dir, "via_region_data.txt"),'r',encoding = 'utf-8')
+        #class_name_nums = []
+        for line in annotations:
             class_name_nums = []
-            class_names_str=[i for i in  class_names_str_temp if bool(i) != False]
-
-            for i in  class_names_str:
-                if i['Flowchart_symbols'] == 'arrow':
-                    class_name_nums.append(1)
-                if i['Flowchart_symbols'] == 'data':
-                    class_name_nums.append(2)
-                if i['Flowchart_symbols'] == 'process':
-                    class_name_nums.append(3)
-                if i['Flowchart_symbols'] == 'decision':
-                    class_name_nums.append(4)
-                if i['Flowchart_symbols'] == 'connection':
-                    class_name_nums.append(5)
-                if i['Flowchart_symbols'] == 'text':
-                    class_name_nums.append(6)
-                if i['Flowchart_symbols'] == 'terminator':
-                    class_name_nums.append(7)
+            data=json.loads(line)
+            val=literal_eval(data)
+            folder=val['fileName'].strip().split('/')[0]
+            print(val['fileName'].strip().split('/')[0])
+            if folder == 'arrow':
+                class_name_nums.append(1)
+            if folder == 'data':
+                class_name_nums.append(2)
+            if folder == 'process':
+                class_name_nums.append(3)
+            if folder == 'decision':
+                class_name_nums.append(4)
+            if folder == 'connection':
+                class_name_nums.append(5)
+            if folder == 'text':
+                class_name_nums.append(6)
+            if folder == 'terminator':
+                class_name_nums.append(7)
+        #    print(class_name_nums)
+            # print(val['fileName'].strip().split('/')[1])
+            # ln=literal_eval(val['fileDetails'])
+            # print(ln['height'])
+            # print(ln['width'])
+            # print(class_name_nums)
+            # print(ln)
+            fileName=val['fileName'].strip().split('/')[1]
+            fileDetails=literal_eval(val['fileDetails'])
+            height=fileDetails['height']
+            width=fileDetails['width']
+            image_path=os.path.join(dataset_dir,val['fileName'])
 
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
             # the image. This is only managable since the dataset is tiny.
-            image_path = os.path.join(dataset_dir, a['filename'])
-            image = skimage.io.imread(image_path)
-            height, width = image.shape[:2]
+            # image_path = os.path.join(dataset_dir, a['filename'])
+            # image = skimage.io.imread(image_path)
+            # height, width = image.shape[:2]
 
             self.add_image(
                 "Flowchart_symbols",
-                image_id=a['filename'],  # use file name as a unique image id
+                image_id=fileName,  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
-                polygons=polygons,
+                polygons=fileDetails,
                 class_ids = np.array(class_name_nums))
 
     def load_mask(self, image_id):
