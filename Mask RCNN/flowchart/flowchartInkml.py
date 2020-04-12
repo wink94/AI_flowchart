@@ -67,7 +67,7 @@ class FlowchartConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 7  # Background + flowchart
+    NUM_CLASSES = 1 + 6  # Background + flowchart
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -88,7 +88,7 @@ class FlowchartDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("Flowchart_symbols", 1, "arrow")
+
         self.add_class("Flowchart_symbols", 2, "data")
         self.add_class("Flowchart_symbols", 3, "process")
         self.add_class("Flowchart_symbols", 4, "decision")
@@ -148,19 +148,19 @@ class FlowchartDataset(utils.Dataset):
             width=fileDetails['width']
             image_path=os.path.join(dataset_dir,val['fileName'])
 
-            print("filename ",fileName)
-            print("fileDetails ",fileDetails)
-            print("height ",height)
-            print("width ",width)
-            print("image_path ",image_path)
-            print("image_path ",class_name_nums)
+            # print("filename ",fileName)
+            # print("fileDetails ",fileDetails)
+            # print("height ",height)
+            # print("width ",width)
+            # print("image_path ",image_path)
+            # print("image_path ",class_name_nums)
 
             self.add_image(
                 "Flowchart_symbols",
                 image_id=fileName,  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
-                polygons=fileDetails,
+                polygons=[fileDetails],
                 class_ids = np.array(class_name_nums))
 
     def load_mask(self, image_id):
@@ -227,7 +227,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=10,
+                epochs=5,
                 layers='heads')
 
 
