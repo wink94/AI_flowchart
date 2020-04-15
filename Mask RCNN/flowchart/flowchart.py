@@ -69,7 +69,7 @@ class FlowchartConfig(Config):
     NUM_CLASSES = 1 + 7  # Background + flowchart
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1000
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -234,7 +234,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=3,
+                epochs=30,
                 layers='heads')
 
 
